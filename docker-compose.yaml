@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   microservice:
-    platform: linux/arm64
+    platform: linux/amd64
     build:
       context: .
       dockerfile: Dockerfile
@@ -31,7 +31,7 @@ services:
       - node_exporter
       - mongo
       - prometheus
-    networks: [ "microservices" ]
+    networks: ["microservices"]
 
   microservices_postgresql:
     image: postgres:latest
@@ -49,7 +49,7 @@ services:
     command: -p 5432
     volumes:
       - ./docker_data/microservices_pgdata:/var/lib/postgresql/data
-    networks: [ "microservices" ]
+    networks: ["microservices"]
 
   zoo1:
     image: confluentinc/cp-zookeeper:7.3.0
@@ -63,7 +63,7 @@ services:
       ZOOKEEPER_SERVERS: zoo1:2888:3888
     volumes:
       - "./zookeeper:/zookeeper"
-    networks: [ "microservices" ]
+    networks: ["microservices"]
 
   kafka1:
     image: confluentinc/cp-kafka:7.3.0
@@ -91,7 +91,7 @@ services:
       - zoo1
     volumes:
       - "./kafka_data:/kafka"
-    networks: [ "microservices" ]
+    networks: ["microservices"]
 
   kafka-ui:
     image: provectuslabs/kafka-ui
@@ -102,14 +102,14 @@ services:
     environment:
       - KAFKA_CLUSTERS_0_NAME=local
       - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka1:19092
-    networks: [ "microservices" ]
+    networks: ["microservices"]
 
   zipkin-all-in-one:
     image: openzipkin/zipkin:latest
     restart: always
     ports:
       - "9411:9411"
-    networks: [ "microservices" ]
+    networks: ["microservices"]
 
   mongo:
     image: mongo
@@ -120,7 +120,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
       MONGODB_DATABASE: bank_accounts
-    networks: [ "microservices" ]
+    networks: ["microservices"]
 
   prometheus:
     image: prom/prometheus:latest
@@ -131,24 +131,23 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    networks: [ "microservices" ]
+    networks: ["microservices"]
 
   node_exporter:
     container_name: microservices_node_exporter
     restart: always
     image: prom/node-exporter
     ports:
-      - '9101:9100'
-    networks: [ "microservices" ]
+      - "9101:9100"
+    networks: ["microservices"]
 
   grafana:
     container_name: microservices_grafana
     restart: always
     image: grafana/grafana
     ports:
-      - '3000:3000'
-    networks: [ "microservices" ]
-
+      - "3000:3000"
+    networks: ["microservices"]
 
 networks:
   microservices:
